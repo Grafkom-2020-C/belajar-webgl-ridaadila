@@ -10,6 +10,7 @@ function main() {
         -0.5, 0.5, //titik A
         0.5, 0.5, // titik B
         0.5, -0.5, // titik C
+        -0.5, 0.5, //titik A
     ];
 
     var vertexBuffer = gl.createBuffer();
@@ -64,9 +65,9 @@ function main() {
     gl.clearColor(0.0,0.22,0.5,1.0);
     gl.clear(gl.COLOR_BUFFER_BIT);
 
-    var primitive = gl.LINE_LOOP;
+    var primitive = gl.LINE_STRIP;
     var offset = 0;
-    var nVertex = 3;
+    var nVertex = 4;
     gl.drawArrays(primitive, offset, nVertex);
 
 }
