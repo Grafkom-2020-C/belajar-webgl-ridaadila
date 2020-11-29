@@ -105,8 +105,30 @@ function main() {
     var offset = 0;
     var nVertex = 6;
 
+    //Elemen interaktif
+    var freeze = false;
+    function onMouseClick(event) {
+        freeze = !freeze;
+    }
+    document.addEventListener("click", onMouseClick, false);
+
+    function onKeyDown(event) {
+        if(event.keyCode==32) {
+            freeze = true;
+        }
+    }
+    function onKeyUp(event) {
+        if(event.keyCode==32) {
+            freeze = false;
+        }
+    }
+
+    document.addEventListener('keydown', onKeyDown, false);
+    document.addEventListener('keyup', onKeyUp, false);
     function render() {
-        d[0] += 0.001;
+        if(!freeze) {
+            d[0] += 0.001;
+        }
         gl.uniform2fv(uD, d);
         gl.clearColor(0.0,0.22,0.5,1.0);
         gl.clear(gl.COLOR_BUFFER_BIT);
