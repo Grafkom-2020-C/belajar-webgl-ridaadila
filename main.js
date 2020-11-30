@@ -26,15 +26,12 @@ function main() {
         attribute vec3 a_Color;
         varying vec3 v_Color;
         uniform vec2 d;
+        uniform mat4 projection;
+        uniform mat4 view;
+        uniform mat4 model;
         void main() {
-            mat4 translasi = mat4(
-                1.0, 0.0, 0.0, 0.0,
-                0.0, 1.0, 0.0, 0.0,
-                0.0, 0.0, 1.0, 0.0,
-                d, 0.0, 1.0
-                );
             gl_PointSize = 25.0;
-            gl_Position = translasi * vec4(a_Position, 0.0, 1.0);
+            gl_Position = projection * view * model * vec4(a_Position, 0.0, 1.0);
             v_Color = a_Color;
         }
     `;
@@ -97,10 +94,6 @@ function main() {
     gl.viewport(100, 0, canvas.height, canvas.height);
 
 
-    var d = [-1.0, 0.0];
-    var uD = gl.getUniformLocation(shaderProgram, 'd');
-    
-
     var primitive = gl.TRIANGLES;
     var offset = 0;
     var nVertex = 6;
@@ -125,11 +118,30 @@ function main() {
 
     document.addEventListener('keydown', onKeyDown, false);
     document.addEventListener('keyup', onKeyUp, false);
+
+    var model = glMatrix.mat4.create();
+    var view = glMatrix.mat4.create();
+    glMatrix.mat4.lookAt(view,
+        [0.0, 0.0, 3.0], //posisi kamera (titik)
+        [0.0, 0.0, -2.0], //kemana kamera menghadap (vektor)
+        [0.0, 1.0, 0.0] // kemana arah atas dari kamera (vektor)
+        );
+    var projection = glMatrix.mat4.create();
+
+    glMatrix.mat4.perspective(projection,
+        glMatrix.glMatrix.toRadian(90),// fov y
+        1.0, //rasio aspek
+        0.5,//near
+        10.0 //far
+        );
+    var uModel = gl.getUniformLocation(shaderProgram, 'model');
+    var uView = gl.getUniformLocation(shaderProgram, 'view');
+    var uProjection = gl.getUniformLocation(shaderProgram, 'projection');
+    gl.uniformMatrix4fv(uProjection, false, projection);
+    gl.uniformMatrix4fv(uView, false, view);
+    gl.uniformMatrix4fv(uModel, false, model);
+
     function render() {
-        if(!freeze) {
-            d[0] += 0.001;
-        }
-        gl.uniform2fv(uD, d);
         gl.clearColor(0.0,0.22,0.5,1.0);
         gl.clear(gl.COLOR_BUFFER_BIT);
         gl.drawArrays(primitive, offset, nVertex);
